@@ -141,6 +141,12 @@ def generate_message_chain(
             """.format(one_message_byte)
         )
         all_list = cursor.fetchall()
+        if not all_list:
+            # TODO We can use Error Correction Codes BEFORE steganography and make some errors
+            # if this event occurs!... This will be a good feature!
+            error = u'There are nothing images with hash={0} in DB! Please download MORE images!' \
+                .format(one_message_byte)
+            raise EnvironmentError(error)
 
         # TODO move random logic to SQLite
         one_record = __get_random(all_list)
