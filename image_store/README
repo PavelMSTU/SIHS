@@ -9,4 +9,4 @@
 
 [main]
 # enumerate each format *.XXX by XXX, separated by space
-format = jpeg jpg bmp
+format = jpeg jpg bmp JPG png
