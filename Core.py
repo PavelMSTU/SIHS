@@ -171,7 +171,7 @@ def generate_message_chain(
     return folder_out
 
 
-def read_massege_chain(
+def read_massage_chain(
     image_folder_in,
 ):
     """
@@ -181,19 +181,35 @@ def read_massege_chain(
     :return:
     list of bytes
     """
+    file_list = os.listdir(image_folder_in)
+    file_list.sort()
 
-    raise NotImplementedError(u'This function is not implement')
+    message = list()
+    for file_ in file_list:
+        file_path = os.path.join(image_folder_in, file_)
+
+        m = sihs_hash(file_path)
+        message.append(m)
+
+    return message
 
 
 def __test1():
     message = [133, 18]
 
+    print u"generate_message_chain(message={0}):".format(message),
     message_folder = generate_message_chain(message)
-    message2 = read_massege_chain(message_folder)
+    print u"DONE ({0})".format(datetime.datetime.now())
 
+    print u"read_massege_chain(message_folder='{0}'):".format(message_folder),
+    message2 = read_massage_chain(message_folder)
+    print u"DONE ({0})".format(datetime.datetime.now())
+
+    print u"Check message1={0} and message2={1}".format(message, message2)
     for m1, m2 in zip(message, message2):
         if m1 != m2:
             raise RuntimeError(u'Core is not work!')
+    print u"all is correct! Good!"
     return True
 
 
