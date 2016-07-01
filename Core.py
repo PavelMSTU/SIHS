@@ -11,7 +11,9 @@
 import os
 import sys
 import datetime
+import random
 import sqlite3
+import shutil
 import ConfigParser
 from time import sleep
 from functools import partial
@@ -30,6 +32,25 @@ IMAGE_HASH_FOLDER = u'image_hash_stego'
 IMAGE_STORE = u'image_store'
 
 DB_PATH = os.path.join(IMAGE_STORE, u'IMAGEDB.sqlite.db')
+
+
+def make_folder_name(
+    message,
+):
+    """
+    Make name of out folder by message.
+
+    :param message: list of bytes
+    :return:
+    unicode name of folder
+    """
+    def __int_to_hex(m):
+        if m < 10:
+            return u"0" + hex(m)[2:]
+        else:
+            return hex(m)[2:]
+
+    return u'0x' + u'-'.join([u'{0}'.format(__int_to_hex(m)) for m in message])
 
 
 def sihs_hash(file_path, count_bytes=1):
@@ -61,8 +82,9 @@ def sihs_hash(file_path, count_bytes=1):
 
 def generate_message_chain(
     message_bytes,
-    image_folder=IMAGE_STORE,
+    image_folder_in=IMAGE_STORE,
     image_folder_out=IMAGE_HASH_FOLDER,
+    db_path=DB_PATH,
 ):
     """
     This function,
@@ -71,14 +93,82 @@ def generate_message_chain(
     generating Hash Steganography message message_bytes
 
     :param message_bytes: message for input (list of bytes)
-    :param image_folder: folder, where exists some images
+    :param image_folder_in: folder, where exists some images
     :param image_folder_out: folder for out stegocontainer
     (chain of images)
+    :param db_path: path od SQLite DB
+    (This DB must be build by make_db)
     :return:
     path of message folder
     """
 
-    raise NotImplementedError(u'This function is not implement')
+    def __get_random(all_list):
+        j = random.randint(0, len(all_list)-1)
+        return all_list[j]
+
+    def one_name(file_, i):
+        name = u'{0}'.format(i)
+        if len(name) > 3:
+            raise NotImplementedError(u"You can't send more then 999 stego bytes!")
+        if len(name) == 1:
+            name = u'00' + name
+        elif len(name) == 2:
+            mane = u'0' + name
+
+        name += u'.' + file_.split(u'.')[-1]
+        return name
+
+    name = make_folder_name(message_bytes)
+    folder_out = os.path.join(image_folder_out, name)
+
+    if os.path.exists(folder_out):
+        print u"WARNING. Folder {0} is also exists. Delete it with all files".format(folder_out)
+        shutil.rmtree(folder_out)
+    os.mkdir(folder_out)
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    delete_img_paths = list()
+    delete_id_list = list()
+    for i, one_message_byte in enumerate(message_bytes):
+        cursor.execute(
+            u"""
+            SELECT id, img_path
+              from IMAGES
+                  where img_hash_1b={0}
+              LIMIT 1000
+            """.format(one_message_byte)
+        )
+        all_list = cursor.fetchall()
+
+        # TODO move random logic to SQLite
+        one_record = __get_random(all_list)
+
+        id_ = one_record[0]
+        file_ = one_record[1]
+
+        file_in_path = os.path.join(image_folder_in, file_)
+        file_out_path = os.path.join(folder_out, one_name(file_, i))
+        shutil.copy(file_in_path, file_out_path)
+
+        delete_img_paths.append(file_in_path)
+        delete_id_list.append(id_)
+
+    # delete used images
+    for id_ in delete_id_list:
+        cursor.execute(
+            u"""
+            DELETE from IMAGES
+              where id={0}
+            """.format(id_)
+        )
+        conn.commit()
+    for file_path in delete_img_paths:
+        os.remove(file_path)
+
+    conn.close()
+    return folder_out
 
 
 def read_massege_chain(
@@ -96,7 +186,7 @@ def read_massege_chain(
 
 
 def __test1():
-    message = [0x02, 0x00]
+    message = [133, 18]
 
     message_folder = generate_message_chain(message)
     message2 = read_massege_chain(message_folder)
@@ -114,7 +204,7 @@ def make_db(
     """
     Function for build DB
 
-    ATTANTION:
+    ATTENTION:
         when you added some image files to IMAGE_STORE
         you must call this function
 
@@ -135,7 +225,7 @@ def make_db(
         CREATE TABLE IMAGES
                 -- Table of image path and its HASH value. Using for Hash-steganography
             (
-                id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY ,
                 img_path TEXT, -- Path of image regarding IMAGE_STORE={0} folder
                 img_hash_1b INTEGER -- ONE byte of hash
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -159,9 +249,8 @@ def make_db(
             INSERT INTO IMAGES
                 (img_path, img_hash_1b)
                 VALUES
-
-                ('{0}', {1})
-            """.format(file_path, hash_)
+                  ('{0}', {1})
+            """.format(file_, hash_)
         )
         conn.commit()
         # TODO check the errors of cursor.execute!
@@ -176,7 +265,7 @@ if __name__ == u"__main__":
     print u"TEST Core " + unicode(datetime.datetime.now())
     sleep(3)
 
-    make_db()
-    # __test1()
+    # make_db()
+    __test1()
 
 
