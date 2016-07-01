@@ -1,0 +1,7 @@
+# В данной папке храняться сгенерированные сообщения
+# Каждое сообщение храниться в своей папке СООБЩЕНИЕ внутри папки image_hash_stego
+# Имя папки СООБЩЕНИЕ полностью совпадает с самим сокрытым стегосообщением
+#
+# This is folder of generated stego messages
+# Each message store by each folder MESSAGE in image_hash_stego folder.
+# Name of MESSAGE is equal by generated stegomessage

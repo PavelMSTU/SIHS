@@ -1,0 +1,12 @@
+# Внутри этой папки содержаться картинки
+# Каждая картинка формата, указанный в main.format будет добавлена в базу данных
+# ... функцией Core.make_bd
+# используйте # для коментариев
+#
+# This is folder of image store.
+# Each image format in 'main.format' will be added to DB by 'Core.make_bd' function
+# use # for comments
+
+[main]
+# enumerate each format *.XXX by XXX, separated by space
+format = jpeg jpg bmp
