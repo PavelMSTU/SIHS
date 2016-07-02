@@ -12,6 +12,10 @@
 import sys
 import datetime
 from time import sleep
+import ConfigParser
+
+config = ConfigParser.RawConfigParser()
+config.read(u'config')
 
 # Name of popular russian IT-forum: https://habrahabr.ru/
 TEST_MESSAGE = u'Хaбр'
@@ -26,7 +30,7 @@ from Core import IMAGE_HASH_FOLDER
 
 __author__ = 'PavelMSTU'
 
-ENCODING = u'koi8-r'
+ENCODING = config.get('SIHS1', 'ENCODING')
 
 SALT = u'В недрах тундры выдры в гетрах тырят в ведра ядра кедра.'\
        +u'ЫВлапУоаы4dвы'

@@ -23,6 +23,9 @@ import hashlib
 
 __author__ = u'PavelMSTU'
 
+config = ConfigParser.RawConfigParser()
+config.read(u'config')
+
 # Out folder. Выходная папка
 IMAGE_HASH_FOLDER = u'image_hash_stego'
 
@@ -236,8 +239,8 @@ def make_db(
     return count of images in DB
     """
 
-    config = ConfigParser.RawConfigParser()
-    config.read(os.path.join(IMAGE_STORE, u'README'))
+    # config = ConfigParser.RawConfigParser()
+    # config.read(os.path.join(IMAGE_STORE, u'README'))
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -266,7 +269,7 @@ def make_db(
     for file_ in os.listdir(IMAGE_STORE):
         file_path = os.path.join(IMAGE_STORE, file_)
 
-        if file_path.split('.')[-1] not in config.get('main', 'format'):
+        if file_path.split('.')[-1] not in config.get('image_store', 'DB_ADD_FORMAT'):
             # this file is not correct format
             continue
 

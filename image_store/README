@@ -6,7 +6,3 @@
 # This is folder of image store.
 # Each image format in 'main.format' will be added to DB by 'Core.make_bd' function
 # use # for comments
-
-[main]
-# enumerate each format *.XXX by XXX, separated by space
-format = jpeg jpg bmp JPG png

@@ -1,0 +1,21 @@
+# Config of all values
+
+# Config for SIHS1 protocol
+[SIHS1]
+
+# Type of encoding messages
+# koi8-r is encoding for both russian and enlish
+# languages.
+# If you want use another language -- change this encoding
+ENCODING = koi8-r
+
+
+# Config of DB
+[image_store]
+
+# enumerate each format of images, separated by space
+# if format not in DB_ADD_FORMAT this files
+# will not added to DB
+DB_ADD_FORMAT = jpeg jpg bmp JPG png
+
+
