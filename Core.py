@@ -23,8 +23,6 @@ import hashlib
 
 __author__ = u'PavelMSTU'
 
-TEST_MESSAGE = u'Хабрахабр'
-
 # Out folder. Выходная папка
 IMAGE_HASH_FOLDER = u'image_hash_stego'
 
@@ -34,7 +32,7 @@ IMAGE_STORE = u'image_store'
 DB_PATH = os.path.join(IMAGE_STORE, u'IMAGEDB.sqlite.db')
 
 
-def make_folder_name(
+def make_folder_message(
     message,
 ):
     """
@@ -85,6 +83,7 @@ def generate_message_chain(
     image_folder_in=IMAGE_STORE,
     image_folder_out=IMAGE_HASH_FOLDER,
     db_path=DB_PATH,
+    folder_message=None,
 ):
     """
     This function,
@@ -118,8 +117,9 @@ def generate_message_chain(
         name += u'.' + file_.split(u'.')[-1]
         return name
 
-    name = make_folder_name(message_bytes)
-    folder_out = os.path.join(image_folder_out, name)
+    if folder_message is None:
+        folder_message = make_folder_message(message_bytes)
+    folder_out = os.path.join(image_folder_out, folder_message)
 
     if os.path.exists(folder_out):
         print u"WARNING. Folder {0} is also exists. Delete it with all files".format(folder_out)
@@ -244,6 +244,12 @@ def make_db(
 
     cursor.execute(
         u"""
+        DROP TABLE IF EXISTS IMAGES
+        """
+    )
+
+    cursor.execute(
+        u"""
         CREATE TABLE IMAGES
                 -- Table of image path and its HASH value. Using for Hash-steganography
             (
@@ -277,7 +283,7 @@ def make_db(
         conn.commit()
         # TODO check the errors of cursor.execute!
         count_insert += 1
-        print u"{0}: Add '{1}' image to DB".format(count_insert, file_path)
+        print u"{0}: Add '{1}' image to DB".format(count_insert, file_)
 
     conn.close()
     return count_insert
@@ -287,7 +293,7 @@ if __name__ == u"__main__":
     print u"TEST Core " + unicode(datetime.datetime.now())
     sleep(3)
 
-    # make_db()
-    __test1()
+    make_db()
+    # __test1()
 
 
