@@ -28,6 +28,20 @@ __author__ = 'PavelMSTU'
 
 ENCODING = u'koi8-r'
 
+SALT = u'В недрах тундры выдры в гетрах тырят в ведра ядра кедра.'\
+       +u'ЫВлапУоаы4dвы'
+
+
+def make_key_by_passwd(passwd):
+    def __hash(a):
+        d = hashlib.sha512()
+        b = a.encode(ENCODING)
+        d.update(b)
+        return d.hexdigest()
+
+    key = __hash(__hash(passwd) + SALT)
+    return key[:32]
+
 
 def generate(
     message,
@@ -47,7 +61,8 @@ def generate(
     """
     m_str = message.encode(ENCODING)
 
-    cipher = XORCipher(passwd)
+    key = make_key_by_passwd(passwd)
+    cipher = XORCipher(key)
     crypt_message = cipher.encrypt(m_str)
 
     message_bytes = [ord(ch) for ch in crypt_message]
@@ -78,7 +93,8 @@ def extract(
 
     crypt_message = ''.join([chr(ch) for ch in message_bytes])
 
-    cipher = XORCipher(passwd)
+    key = make_key_by_passwd(passwd)
+    cipher = XORCipher(key)
     str_message = cipher.encrypt(crypt_message)
 
     try:
