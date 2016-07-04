@@ -18,4 +18,9 @@ ENCODING = koi8-r
 # will not added to DB
 DB_ADD_FORMAT = jpeg jpg bmp JPG png
 
+IN_FOLDER = image_store
 
+OUT_FOLDER = image_hash_stego
+
+# If you use Windows, change '\' to '/' type
+DB_PATH = image_store\IMAGEDB.sqlite.db

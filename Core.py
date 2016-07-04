@@ -27,12 +27,12 @@ config = ConfigParser.RawConfigParser()
 config.read(u'config')
 
 # Out folder. Выходная папка
-IMAGE_HASH_FOLDER = u'image_hash_stego'
+IMAGE_HASH_FOLDER = config.get(u'image_store', u'OUT_FOLDER').decode(u'utf-8')
 
 # Input folder. Входная папка
-IMAGE_STORE = u'image_store'
+IMAGE_STORE = config.get(u'image_store', u'IN_FOLDER').decode(u'utf-8')
 
-DB_PATH = os.path.join(IMAGE_STORE, u'IMAGEDB.sqlite.db')
+DB_PATH = config.get(u'image_store', u'DB_PATH').decode(u'utf-8')
 
 
 def make_folder_message(
