@@ -89,6 +89,7 @@ def generate_message_chain(
     image_folder_out=IMAGE_HASH_FOLDER,
     db_path=DB_PATH,
     folder_message=None,
+    verbose=True,
 ):
     """
     This function,
@@ -102,6 +103,7 @@ def generate_message_chain(
     (chain of images)
     :param db_path: path od SQLite DB
     (This DB must be build by make_db)
+    :param verbose: verbose in console
     :return:
     path of message folder
     """
@@ -127,7 +129,8 @@ def generate_message_chain(
     folder_out = os.path.join(image_folder_out, folder_message)
 
     if os.path.exists(folder_out):
-        print u"WARNING. Folder {0} is also exists. Delete it with all files".format(folder_out)
+        if verbose:
+            print u"WARNING. Folder {0} is also exists. Delete it with all files".format(folder_out)
         shutil.rmtree(folder_out)
     os.mkdir(folder_out)
 
@@ -184,11 +187,13 @@ def generate_message_chain(
 
 def read_massage_chain(
     image_folder_in,
+    verbose=True,
 ):
     """
     This function read image chain in image_folder_out
     and return message_bytes
     :param image_folder_in: folger of message chain
+    :param verbose: verbose in console
     :return:
     list of bytes
     """

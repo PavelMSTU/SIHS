@@ -9,7 +9,7 @@
     Autor: 'pavel'
 """
 SIHS = '1'
-SIHS1_VERSION = '{0}.0.6'.format(SIHS)
+SIHS1_VERSION = '{0}.0.7'.format(SIHS)
 
 
 from Core import make_db
@@ -56,6 +56,7 @@ def generate(
     message,
     passwd,
     image_folder_out=IMAGE_HASH_FOLDER,
+    verbose=True,
 ):
     """
     Function for generate message
@@ -65,6 +66,7 @@ def generate(
     :param passwd: password for key generating in cryptography
     :param image_folder_out: folder, where will be make folder
     of hash-stego images
+    :param verbose: verbose in console
     :return:
     folder_out path
     """
@@ -75,13 +77,15 @@ def generate(
     crypt_message = cipher.encrypt(m_str)
 
     message_bytes = [ord(ch) for ch in crypt_message]
-    print u"message_bytes={0}".format(message_bytes)
+    if verbose:
+        print u"message_bytes={0}".format(message_bytes)
 
     try:
         folder_out = generate_message_chain(
             message_bytes,
             image_folder_out=image_folder_out,
             folder_message=message,
+            verbose=verbose,
         )
     except Exception, error:
         return None, error
@@ -91,17 +95,19 @@ def generate(
 def extract(
     folder_in,
     passwd,
+    verbose=True,
 ):
     """
     Function for extract message for hash-steganography
 
     :param folder_in: folder of images
     :param passwd: password for cryptography
+    :param verbose: verbose in console
     :return:
     message
     or None, if passwd is wrong
     """
-    message_bytes = read_massage_chain(folder_in)
+    message_bytes = read_massage_chain(folder_in, verbose=verbose)
 
     crypt_message = ''.join([chr(ch) for ch in message_bytes])
 
@@ -169,7 +175,11 @@ def main(options):
         if options.verbose:
             print u'Generate message={0} and password={1}'\
                 .format(options.message, blind_password)
-        folder_out, error = generate(message=options.message, passwd=options.password)
+        folder_out, error = generate(
+            message=options.message,
+            passwd=options.password,
+            verbose=options.verbose,
+        )
 
         if error:
             print u"ERROR:", error
@@ -191,7 +201,11 @@ def main(options):
             print u"Extract from '{0}' folder by password={1} "\
                 .format(options.folder, blind_password)
 
-        message = extract(options.folder, options.password)
+        message = extract(
+            folder_in=options.folder,
+            passwd=options.password,
+            verbose=options.verbose,
+        )
 
         if options.verbose:
             print u"All is Success (if password is correct)!\nmessage='{0}'".format(message)
