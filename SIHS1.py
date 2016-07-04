@@ -9,7 +9,7 @@
     Autor: 'pavel'
 """
 SIHS = '1'
-SIHS1_VERSION = '{0}.0.5'.format(SIHS)
+SIHS1_VERSION = '{0}.0.6'.format(SIHS)
 
 
 from Core import make_db
@@ -77,12 +77,15 @@ def generate(
     message_bytes = [ord(ch) for ch in crypt_message]
     print u"message_bytes={0}".format(message_bytes)
 
-    folder_out = generate_message_chain(
-        message_bytes,
-        image_folder_out=image_folder_out,
-        folder_message=message,
-    )
-    return folder_out
+    try:
+        folder_out = generate_message_chain(
+            message_bytes,
+            image_folder_out=image_folder_out,
+            folder_message=message,
+        )
+    except Exception, error:
+        return None, error
+    return folder_out, None
 
 
 def extract(
@@ -118,7 +121,7 @@ def __test2():
     passwd = u'PUTIN'
     message1 = TEST_MESSAGE
 
-    folder_out = generate(message=message1, passwd=passwd)
+    folder_out, _ = generate(message=message1, passwd=passwd)
     message2 = extract(folder_out, passwd=passwd)
 
     print u"message1={0} message2={1}"\
@@ -166,7 +169,11 @@ def main(options):
         if options.verbose:
             print u'Generate message={0} and password={1}'\
                 .format(options.message, blind_password)
-        folder_out = generate(message=options.message, passwd=options.password)
+        folder_out, error = generate(message=options.message, passwd=options.password)
+
+        if error:
+            print u"ERROR:", error
+            return -4
 
         if options.verbose:
             print u"All is Success! See folder '{0}'".format(folder_out)
@@ -200,7 +207,7 @@ def console():
 SIHS1 -- Simple Image Hash-Steganograhpy, protocol №1
 version = {VERSION}
 
-autor: PavelMSTU <PavelMSTU@stego.su>
+author: PavelMSTU <PavelMSTU@stego.su>
 source in GitHub: https://github.com/PavelMSTU/SIHS
 see also config file for configure this Python script
 """.format(VERSION=SIHS1_VERSION)
