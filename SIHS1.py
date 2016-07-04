@@ -8,7 +8,12 @@
     Created in 2016.07.02  01:49 
     Autor: 'pavel'
 """
+SIHS = '1'
+SIHS1_VERSION = '{0}.0.5'.format(SIHS)
 
+
+from Core import make_db
+from optparse import OptionParser
 import sys
 import datetime
 from time import sleep
@@ -125,5 +130,140 @@ def __test2():
     print u"All is good!"
 
 
+def main(options):
+
+    if options.need_make_db:
+        if options.verbose:
+            print u"Make DB:"
+        # make_db(verbose=options.verbose)
+        make_db()
+
+    if options.mode_generate and options.mode_extract:
+        print u"ERROR: You cant use both -g -e."
+        return -100
+    elif not options.mode_generate and not options.mode_extract\
+            and not options.need_make_db:
+        print u"Simple Image Hash-steganography, protocol №1"
+        print u"Use '-g', '-e' or '-b' options. See --help"
+        return 0
+    elif not options.mode_generate and not options.mode_extract:
+        print u"BD is build"
+        return 0
+
+    if options.password is None:
+        print u"ERROR: password is None. Use '-p STRING' option"
+        return -1
+    options.password = options.password.decode(u'utf-8')
+
+    blind_password = u''.join([u'*' for _ in options.password])
+
+    if options.mode_generate:
+        if options.message is None:
+            print u"ERROR: message is None. Use '-m STRING' option"
+            return -2
+        options.message = options.message.decode(u'utf-8')
+
+        if options.verbose:
+            print u'Generate message={0} and password={1}'\
+                .format(options.message, blind_password)
+        folder_out = generate(message=options.message, passwd=options.password)
+
+        if options.verbose:
+            print u"All is Success! See folder '{0}'".format(folder_out)
+        else:
+            print folder_out
+        return 0
+
+    if options.mode_extract:
+        if options.folder is None:
+            print u"ERROR: message is None. Use '-m STRING' option"
+            return -3
+        options.folder = options.folder.decode(u'utf-8')
+
+        if options.verbose:
+            print u"Extract from '{0}' folder by password={1} "\
+                .format(options.folder, blind_password)
+
+        message = extract(options.folder, options.password)
+
+        if options.verbose:
+            print u"All is Success (if password is correct)!\nmessage='{0}'".format(message)
+        else:
+            print message
+        return 0
+
+
+def console():
+    from Core import DB_PATH, IMAGE_STORE, DB_ADD_FORMAT
+
+    usage = u"""usage: %prog [options]
+SIHS1 -- Simple Image Hash-Steganograhpy, protocol №1
+version = {VERSION}
+
+autor: PavelMSTU <PavelMSTU@stego.su>
+source in GitHub: https://github.com/PavelMSTU/SIHS
+see also config file for configure this Python script
+""".format(VERSION=SIHS1_VERSION)
+
+    parser = OptionParser(usage=usage)
+    parser.add_option(
+        u"-b", u"--makedb",
+        dest=u"need_make_db",
+        action=u"store_true",
+        help=u"Make base in {0}, using {1} files in {2}"
+            .format(DB_PATH, DB_ADD_FORMAT, IMAGE_STORE),
+        default=False,
+    )
+    parser.add_option(
+        u"-q", u"--quiet",
+        dest=u"verbose",
+        action=u"store_false",
+        help=u"be quiet (return ONLY result and errors)",
+        default=True,
+    )
+
+    parser.add_option(
+        u"-m", u"--message",
+        dest=u"message",
+        help=u"Message to generate (see -g) by SIHS1",
+        default=None,
+        metavar=u"STRING",
+    )
+
+    parser.add_option(
+        u"-p", u"--password",
+        dest=u"password",
+        help=u"Password for generate by SIHS1 or extract by SIHS1",
+        default=None,
+        metavar=u"STRING",
+    )
+
+    parser.add_option(
+        u"-f", u"--folder",
+        dest=u"folder",
+        help=u"Folder for extract (see -e) by SIHS1",
+        default=None,
+        metavar=u"PATH",
+    )
+
+    parser.add_option(
+        u"-g", u"--generate",
+        dest=u"mode_generate",
+        action=u"store_true",
+        default=False,
+        help=u"Mode for generate message (see -m)",
+    )
+    parser.add_option(
+        u"-e", u"--extract",
+        dest=u"mode_extract",
+        action=u"store_true",
+        default=False,
+        help=u"Mode for extract message from folder (see -f). Return MESSAGE, if nothing errors occur",
+    )
+
+    (options, args) = parser.parse_args()
+    main(options)
+
 if __name__ == "__main__":
-    __test2()
+    # __test2()
+    console()
