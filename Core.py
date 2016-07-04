@@ -34,6 +34,8 @@ IMAGE_STORE = config.get(u'image_store', u'IN_FOLDER').decode(u'utf-8')
 
 DB_PATH = config.get(u'image_store', u'DB_PATH').decode(u'utf-8')
 
+DB_ADD_FORMAT = config.get(u'image_store', u'DB_ADD_FORMAT').decode(u'utf-8')
+
 
 def make_folder_message(
     message,
@@ -269,7 +271,7 @@ def make_db(
     for file_ in os.listdir(IMAGE_STORE):
         file_path = os.path.join(IMAGE_STORE, file_)
 
-        if file_path.split('.')[-1] not in config.get('image_store', 'DB_ADD_FORMAT'):
+        if file_path.split('.')[-1] not in DB_ADD_FORMAT:
             # this file is not correct format
             continue
 
@@ -293,10 +295,7 @@ def make_db(
 
 
 if __name__ == u"__main__":
-    print u"TEST Core " + unicode(datetime.datetime.now())
-    sleep(3)
+    print u"This is Core. Use $>python SIHS1.py --help"
 
-    make_db()
-    # __test1()
 
 

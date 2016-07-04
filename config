@@ -16,7 +16,7 @@ ENCODING = koi8-r
 # enumerate each format of images, separated by space
 # if format not in DB_ADD_FORMAT this files
 # will not added to DB
-DB_ADD_FORMAT = jpeg jpg bmp JPG png
+DB_ADD_FORMAT = *.jpeg *.jpg *.bmp *.JPG *.png
 
 IN_FOLDER = image_store
 
