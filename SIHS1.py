@@ -9,7 +9,7 @@
     Autor: 'pavel'
 """
 SIHS = '1'
-SIHS1_VERSION = '{0}.0.8'.format(SIHS)
+SIHS1_VERSION = '{0}.0.9'.format(SIHS)
 
 
 from Core import make_db
@@ -145,11 +145,12 @@ def __test2():
 
 def main(options):
 
+    count_insert = None
+    begin_work = datetime.datetime.now()
     if options.need_make_db:
         if options.verbose:
             print u"Make DB:"
-        # make_db(verbose=options.verbose)
-        make_db()
+        count_insert = make_db(verbose=options.verbose)
 
     if options.mode_generate and options.mode_extract:
         print u"ERROR: You cant use both -g -e."
@@ -160,7 +161,10 @@ def main(options):
         print u"Use '-g', '-e' or '-b' options. See --help"
         return 0
     elif not options.mode_generate and not options.mode_extract:
-        print u"BD is build"
+        end_work = datetime.datetime.now()
+        spend_time = end_work - begin_work
+        print u"BD is build.\ncount of image HASHes={0}".format(count_insert)
+        print u"Spend time:{0}".format(spend_time)
         return 0
 
     if options.password is None:
@@ -176,6 +180,13 @@ def main(options):
             return -2
         options.message = options.message.decode(u'utf-8')
 
+        image_folder_out = options.folder
+        if image_folder_out is None:
+            if options.verbose:
+                print u"WARNING: -f PATH not set. Default folder={0}"\
+                    .format(IMAGE_HASH_FOLDER)
+            image_folder_out = IMAGE_HASH_FOLDER
+
         if options.verbose:
             print u'Generate message={0} and password={1}'\
                 .format(options.message, blind_password)
@@ -183,6 +194,7 @@ def main(options):
             message=options.message,
             passwd=options.password,
             verbose=options.verbose,
+            image_folder_out=image_folder_out,
         )
 
         if error:
@@ -238,7 +250,7 @@ see also config file for configure this Python script
         u"-b", u"--makedb",
         dest=u"need_make_db",
         action=u"store_true",
-        help=u"Make base in {0}, using {1} files in {2}"
+        help=u"Make base in {0}, using {1} files in {2}\nWARNING: base can build a lot of time!"
             .format(DB_PATH, DB_ADD_FORMAT, IMAGE_STORE),
         default=False,
     )

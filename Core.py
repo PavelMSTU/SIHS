@@ -232,6 +232,7 @@ def __test1():
 def make_db(
     image_store_folder=IMAGE_STORE,
     db_path=DB_PATH,
+    verbose=True,
 ):
     """
     Function for build DB
@@ -242,6 +243,7 @@ def make_db(
 
     :param image_store_folder: folder, where images is store.
     :param db_path: path of DB
+    :param verbose: verbose in console
     :return:
     return count of images in DB
     """
@@ -293,7 +295,8 @@ def make_db(
         conn.commit()
         # TODO check the errors of cursor.execute!
         count_insert += 1
-        print u"{0}: Add '{1}' image to DB".format(count_insert, file_)
+        if verbose:
+            print u"{0}: Add '{1}' image to DB".format(count_insert, file_)
 
     conn.close()
     return count_insert
