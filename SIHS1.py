@@ -9,7 +9,7 @@
     Autor: 'pavel'
 """
 SIHS = '1'
-SIHS1_VERSION = '{0}.0.7'.format(SIHS)
+SIHS1_VERSION = '{0}.0.8'.format(SIHS)
 
 
 from Core import make_db
@@ -107,7 +107,10 @@ def extract(
     message
     or None, if passwd is wrong
     """
-    message_bytes = read_massage_chain(folder_in, verbose=verbose)
+    try:
+        message_bytes = read_massage_chain(folder_in, verbose=verbose)
+    except Exception, error:
+        return None, error
 
     crypt_message = ''.join([chr(ch) for ch in message_bytes])
 
@@ -118,8 +121,9 @@ def extract(
     try:
         message = str_message.decode(ENCODING)
     except Exception, error:
-        message = None
-    return message
+        error2 = Exception(u'Uncorrect password')
+        message = None, error2
+    return message, None
 
 
 def __test2():
@@ -128,7 +132,7 @@ def __test2():
     message1 = TEST_MESSAGE
 
     folder_out, _ = generate(message=message1, passwd=passwd)
-    message2 = extract(folder_out, passwd=passwd)
+    message2, _ = extract(folder_out, passwd=passwd)
 
     print u"message1={0} message2={1}"\
         .format(message1, message2)
@@ -201,11 +205,14 @@ def main(options):
             print u"Extract from '{0}' folder by password={1} "\
                 .format(options.folder, blind_password)
 
-        message = extract(
+        message, error = extract(
             folder_in=options.folder,
             passwd=options.password,
             verbose=options.verbose,
         )
+        if error:
+            print u"ERROR:", error
+            return -5
 
         if options.verbose:
             print u"All is Success (if password is correct)!\nmessage='{0}'".format(message)
